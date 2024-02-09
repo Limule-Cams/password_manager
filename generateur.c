@@ -179,15 +179,17 @@ int remove_pass(const char *file, int id) {
     return 0;
 }
 
-long search_(char *file, char *name, int id){
+int search_(char *file, char *name){
     Info user;
     FILE *fic = NULL;
-    if((fic = fopen(file, "rb")==NULL)){
+    fic = fopen(file, "rb");
+    if((fic==NULL)){
             perror("erreur d'ouverture");
             return -1;
     }
-    while(fread(&user, sizeof(Info), 1, file)==1){
-        if(strcmp(user.nom, name)==0 && user.id==id){
+
+    while(fread(&user, sizeof(Info), 1, fic)==1){
+        if(strcmp(user.nom, name)){
             fclose(fic);
             return 1;
         }
@@ -200,15 +202,15 @@ long search_(char *file, char *name, int id){
 int change_password(char *file, char *name, int id, Info new_info){
     
     FILE *fic = NULL;
-    long size_data = search_(file, name, id);
+    int size_data = search_(file, name);
 
-    if((file = fopen(file, "rb+")==NULL)){
+    if((fic = fopen(file, "rb+"))==NULL){
             perror("erreur d'ouverture");
             return -1;
     }
     Info user;
     long position;
-    while(fread(&user, sizeof(Info), 1, file)==1){
+    while(fread(&user, sizeof(Info), 1, fic)==1){
         if(strcmp(user.nom, name)==0 && user.id==id){
             position = ftell(fic) - sizeof(Info);
             fseek(fic, position, SEEK_SET);
@@ -239,7 +241,7 @@ int export_file(char *myfile, char *file){
     }
     fputs("id  description  nom  password", fic_w);
     while(fread(&user, sizeof(Info), 1, fic_r)==1){
-        fprintf(fic_w, "%d %s %s %s\n", user.description, user.nom, user.passwd);
+        fprintf(fic_w, "%s %s %s\n", user.description, user.nom, user.passwd);
     }
     fclose(fic_r);
     fclose(fic_w);

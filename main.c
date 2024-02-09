@@ -42,6 +42,10 @@ int main(){
             read_all_file(myfile);
             break;
 
+        case 3:
+            char fils [] = "export.db";
+            export_file("password.bin", fils);
+
         default:
             printf("choix invalide reessayer");
     }
