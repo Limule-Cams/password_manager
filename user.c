@@ -1,33 +1,28 @@
 #include "user.h"
 
-// fonction de verification de connexion 
 
-   int logger(const char *name, const char *password, const char *myfile) {
-    FILE *fic = NULL;
+int search_(const char *file, const char *name, const char *password) {
     Info_con user;
-
-    // Ouvrir le fichier en mode lecture
-    fic = fopen(myfile, "rb");
+    FILE *fic = fopen(file, "rb");
     if(fic == NULL) {
         perror("Erreur d'ouverture du fichier");
         return -1;
     }
 
-    // Parcourir le fichier pour trouver l'utilisateur
     while(fread(&user, sizeof(Info_con), 1, fic) == 1) {
-        // Vérifier si les informations de connexion correspondent
-        if(strcmp(user.name, name) == 0 && strcmp(user.password, password) == 0) {
-            fclose(fic);
-            return 0; // Connexion réussie
+        if(strcmp(user.name, name) == 0) {
+            // Si aucun mot de passe n'est fourni, retourner directement l'utilisateur trouvé
+            if (password == NULL || strcmp(user.password, password) == 0) {
+                fclose(fic);
+                return 1; // Utilisateur trouvé
+            }
         }
     }
-    
-    // Fermer le fichier
-    fclose(fic);
 
-    // Si les informations de connexion ne correspondent à aucun utilisateur, retourner 1
-    return 1;
+    fclose(fic);
+    return -1; // Utilisateur non trouvé
 }
+
 
 
 void save_user(const char *name, const char *password, const char *myfile) {
@@ -36,24 +31,12 @@ void save_user(const char *name, const char *password, const char *myfile) {
     Info_con user1;
     Info_con existing_user;
 
-    // Ouvrir le fichier en mode lecture pour vérifier les doublons
-    fic = fopen(myfile, "rb");
-    if (fic == NULL) {
-        perror("erreur lors de l'ouverture du fichier");
+    if(search_(myfile, name, NULL)==1){
+        fprintf(stdout, "erreur nom d'utilisateur existant\n ");
         exit(EXIT_FAILURE);
     }
 
-    // Vérifier s'il existe déjà un utilisateur avec le même nom
-    while (fread(&existing_user, sizeof(Info_con), 1, fic) == 1) {
-        if (strcmp(existing_user.name, name) == 0) {
-            fclose(fic);
-            fprintf(stderr, "L'utilisateur %s existe déjà.\n", name);
-            exit(EXIT_FAILURE);
-        }
-    }
-
     // Fermer le fichier pour le rouvrir en mode ajout
-    fclose(fic);
 
     // Ouvrir le fichier en mode ajout
     fic = fopen(myfile, "ab");
@@ -78,13 +61,13 @@ void save_user(const char *name, const char *password, const char *myfile) {
      * ou directement appelé votre fonction pour hacher le mot de passe avant de le sauvegarder
     */
     strncpy(user1.password, password, sizeof(user1.password) - 1);
-    user1.password[sizeof(user1.password) - 1] = '\0'; // Assurer une terminaison nulle
+    user1.password[sizeof(user1.password) - 1] = '\0'; 
 
     // Copie des premiers 4 caractères de name dans user1->file
     strncpy(user1.file, name, 4);
-    user1.file[4] = '\0'; // Assurer une terminaison nulle
+    user1.file[4] = '\0'; 
 
-    // Concaténation de ".pass" à user1->file
+    // Concaténation de ".pass" à user1->file 
     strcat(user1.file, ".pass");
 
     // Écriture de user1 dans le fichier
@@ -101,30 +84,12 @@ void save_user(const char *name, const char *password, const char *myfile) {
     fclose(fic);
 }
 
-//____________________________________________________________________________________________________________
-
-int search_(char *file, char *name){
-    Info_con user;
-    FILE *fic = NULL;
-    if((fic = fopen(file, "rb")==NULL)){
-            perror("erreur d'ouverture");
-            return -1;
-    }
-    while(fread(&user, sizeof(Info_con), 1, file)==1){
-        if(strcmp(user.name, name)){
-            fclose(fic);
-            return 1;
-        }
-    }
-    fclose(fic);
-    return 0;
-}
 
 
-int change_password(char *file, char *name, int id, Info_con new_info){
+int change_password(char *file, char *name, char *password, Info_con new_info){
     
     FILE *fic = NULL;
-    int size_data = search_(file, name);
+
 
     if((file = fopen(file, "rb+")==NULL)){
             perror("erreur d'ouverture");

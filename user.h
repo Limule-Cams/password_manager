@@ -14,8 +14,7 @@ typedef struct{
 }Info_con;
 
 void save_user(const char *name, const char *password, const  char *myfile);
-int logger(const char *name, const char *password, const char *myfile);
-int search_(char *file, char *name);
-int change_password(char *file, char *name, int id, Info_con new_info);
+int search_(const char *file, const char *name, const char *password);
+int change_password(char *file, char *name, char *password, Info_con new_info);
 
 #endif

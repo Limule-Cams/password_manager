@@ -220,3 +220,28 @@ int change_password(char *file, char *name, int id, Info new_info){
 
     return 0;
 }
+
+int export_file(char *myfile, char *file){
+    FILE *fic_r = NULL, *fic_w = NULL;
+    Info user;
+
+    fic_r = fopen(myfile,"rb");
+    fic_w = fopen(file, "w") ;
+
+    if(fic_r==NULL){
+        perror("Fail open");
+        return -1;
+    }
+    if(fic_w==NULL){
+        perror("Fail open");
+        fclose(fic_r);
+        return -1;
+    }
+    fputs("id  description  nom  password", fic_w);
+    while(fread(&user, sizeof(Info), 1, fic_r)==1){
+        fprintf(fic_w, "%d %s %s %s\n", user.description, user.nom, user.passwd);
+    }
+    fclose(fic_r);
+    fclose(fic_w);
+    return 0;
+}

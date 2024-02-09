@@ -26,6 +26,7 @@ void read_all_file(const char *file);
 int remove_pass(const char *file, int id);
 int change_password(char *file, char *name, int id, Info new_info);
 long search_(char *file, char *name, int id);
+int export_file(char *myfile, char *file);
 
 #endif
 
