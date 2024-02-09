@@ -6,7 +6,6 @@
 #include<string.h>
 #include<time.h>
 #include<unistd.h>
-#include <sodium.h>
 
 #define PASSWORD_LENGTH 20
 typedef struct Info{
@@ -16,11 +15,7 @@ typedef struct Info{
     char passwd[20]; 
  }Info;
 
-typedef struct{
-    char name[20];
-    char password[30];
-    char file[10];
-}Info_con;
+
  
 int choice();
 char* password_generate();
@@ -29,8 +24,8 @@ int add_pass(const char *file, Info *data_write);
 int id_generator(const char *file);
 void read_all_file(const char *file);
 int remove_pass(const char *file, int id);
+int change_password(char *file, char *name, int id, Info new_info);
+long search_(char *file, char *name, int id);
 
-void save_user(const char *name, const char *password, const  char *myfile);
-int logger(const char *name, const char *password, const char *myfile);
 #endif
 
