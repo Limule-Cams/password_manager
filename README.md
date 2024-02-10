@@ -27,7 +27,7 @@ libsodium : [Installation](https://libsodium.gitbook.io/doc/installation)
 
 ## Contact
 
-Pour toute question, suggestion ou contribution, n'hésitez pas à me contacter par e-mail à [votre-adresse-mail@example.com](mailto:hcamara903@proton.me).
+Pour toute question, suggestion ou contribution, n'hésitez pas à me contacter par e-mail à [hcamara903@proton.me](mailto:hcamara903@proton.me).
 
 ## Licence
 Ce projet est sous licence MIT. Pour plus d'informations, veuillez consulter le fichier LICENSE.
