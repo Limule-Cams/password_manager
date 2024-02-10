@@ -1,0 +1,17 @@
+# Fichiers binaires
+*.exe
+*.out
+*.bin
+*.tmp
+*.so
+*.o
+.vscode
+*.db
+*.swp
+*.txt
+
+# Fichiers de configuration locaux
+config.ini
+
+# Répertoires de dépendances
+libs/
