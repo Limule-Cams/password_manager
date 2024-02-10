@@ -3,7 +3,7 @@
 
 int main(){
     int ch;
-    const char myfile[] = "password.bin";
+    const char myfile[] = "password.bin", fils [] = "export.db";
     printf("\n Hello welcome to password manager (- -) !");
     printf("\n                                      Selectionner l'action a effectuer\n 1- Generer un mot de passe\n 2- Consulter vos mot de pass\n");
     scanf("%d",&ch);
@@ -43,8 +43,12 @@ int main(){
             break;
 
         case 3:
-            char fils [] = "export.db";
-            export_file("password.bin", fils);
+            export_file(myfile, fils);
+            break;
+        
+        case 4:
+            import_file(fils, myfile);
+            break;
 
         default:
             printf("choix invalide reessayer");

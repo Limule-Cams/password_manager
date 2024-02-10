@@ -223,27 +223,56 @@ int change_password(char *file, char *name, int id, Info new_info){
     return 0;
 }
 
-int export_file(char *myfile, char *file){
+int export_file(const char *myfile, const char *file){
     FILE *fic_r = NULL, *fic_w = NULL;
     Info user;
 
     fic_r = fopen(myfile,"rb");
-    fic_w = fopen(file, "w") ;
 
     if(fic_r==NULL){
         perror("Fail open");
         return -1;
     }
+
+    fic_w = fopen(file, "w") ;
+
     if(fic_w==NULL){
         perror("Fail open");
         fclose(fic_r);
         return -1;
     }
-    fputs("id  description  nom  password", fic_w);
+    fputs("id  description  nom  password\n", fic_w);
     while(fread(&user, sizeof(Info), 1, fic_r)==1){
         fprintf(fic_w, "%s %s %s\n", user.description, user.nom, user.passwd);
     }
     fclose(fic_r);
     fclose(fic_w);
     return 0;
+}
+
+void import_file(const char *file_path, const char *master_password){
+    FILE *fic_r = NULL;
+    FILE *fic_r = fopen(file_path, "r");
+    if (fic_r == NULL) {
+        perror("fail open file");
+        return;
+    }
+
+    char username[MAX_USERNAME_LENGTH];
+    char description[MAX_DESCRIPTION_LENGTH];
+    char password[PASSWORD_LENGTH];
+
+    size_t taille_premiere_ligne = strlen("id description nom password\n");
+    fseek(fic_r, taille_premiere_ligne, SEEK_SET);
+    
+    while (fscanf(fic_r, "%s %s %s", username, description, password)==3)
+    {
+        Info *user = initialise(username, description, password);
+        if(user!=NULL){
+            add_pass(master_password, user);
+        }
+    }
+
+    fclose(fic_r);
+    
 }
