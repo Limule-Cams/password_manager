@@ -25,8 +25,9 @@ Importer des données à partir d'un fichier existant.
 ## Prérequis
 libsodium : [Installation](https://libsodium.gitbook.io/doc/installation)
 
-## Contribution
-Les contributions sont les bienvenues ! Si vous souhaitez contribuer à ce projet, veuillez consulter le fichier CONTRIBUTING.md pour obtenir des instructions sur la façon de démarrer.
+## Contact
+
+Pour toute question, suggestion ou contribution, n'hésitez pas à me contacter par e-mail à [votre-adresse-mail@example.com](mailto:hcamara903@proton.me).
 
 ## Licence
 Ce projet est sous licence MIT. Pour plus d'informations, veuillez consulter le fichier LICENSE.
