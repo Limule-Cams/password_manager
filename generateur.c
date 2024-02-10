@@ -252,7 +252,7 @@ int export_file(const char *myfile, const char *file){
 
 void import_file(const char *file_path, const char *master_password){
     FILE *fic_r = NULL;
-    FILE *fic_r = fopen(file_path, "r");
+    fic_r = fopen(file_path, "r");
     if (fic_r == NULL) {
         perror("fail open file");
         return;
@@ -264,7 +264,7 @@ void import_file(const char *file_path, const char *master_password){
 
     size_t taille_premiere_ligne = strlen("id description nom password\n");
     fseek(fic_r, taille_premiere_ligne, SEEK_SET);
-    
+
     while (fscanf(fic_r, "%s %s %s", username, description, password)==3)
     {
         Info *user = initialise(username, description, password);

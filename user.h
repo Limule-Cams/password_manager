@@ -6,6 +6,7 @@
 #include<string.h>
 #include<time.h>
 #include<unistd.h>
+#include<ctype.h>
 
 typedef struct{
     char name[20];
@@ -13,8 +14,14 @@ typedef struct{
     char file[10];
 }Info_con;
 
+typedef enum{
+    false,
+    true
+}bool;
+
 void save_user(const char *name, const char *password, const  char *myfile);
 int search_(const char *file, const char *name, const char *password);
 int change_password(char *file, char *name, char *password, Info_con new_info);
+int checkPasswordStrength(const char *password);
 
 #endif

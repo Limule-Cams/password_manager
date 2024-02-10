@@ -1,7 +1,7 @@
 #include "user.h"
 
-
 int search_(const char *file, const char *name, const char *password) {
+    // fonction servant pour la recherche et la connexion suivant la valeur de password
     Info_con user;
     FILE *fic = fopen(file, "rb");
     if(fic == NULL) {
@@ -11,10 +11,10 @@ int search_(const char *file, const char *name, const char *password) {
 
     while(fread(&user, sizeof(Info_con), 1, fic) == 1) {
         if(strcmp(user.name, name) == 0) {
-            // Si aucun mot de passe n'est fourni, retourner directement l'utilisateur trouvé
+            // si aucun mot de passe n'est fourni, retourner directement l'utilisateur trouvé
             if (password == NULL || strcmp(user.password, password) == 0) {
                 fclose(fic);
-                return 1; // Utilisateur trouvé
+                return 1; // utilisateur et ou password trouvé 
             }
         }
     }
@@ -35,8 +35,6 @@ void save_user(const char *name, const char *password, const char *myfile) {
         fprintf(stdout, "erreur nom d'utilisateur existant\n ");
         exit(EXIT_FAILURE);
     }
-
-    // Fermer le fichier pour le rouvrir en mode ajout
 
     // Ouvrir le fichier en mode ajout
     fic = fopen(myfile, "ab");
@@ -108,4 +106,45 @@ int change_password(char *file, char *name, char *password, Info_con new_info){
     }
 
     return 0;
+}
+
+int checkPasswordStrength(const char *password){
+    int min_len = 8;
+    bool is_uper;
+    bool is_lower;
+    bool is_digit;
+    bool is_special_car;
+    
+    int len_pass = strlen(password), indicate=0;
+
+    for(int i=0; i<len_pass; i++){
+
+        char c = password[i];
+        if(isdigit(c))
+            is_digit = true;
+        else if(isupper(c))
+            is_uper = true;
+        else if(islower(c))
+            is_lower = true;
+        else if(ispunct(c))
+            is_special_car = true;
+        else{
+            char no_valide[] = "éèeêàâûîôùïö";
+            if(strchr(no_valide, c))
+                return -1;
+        }
+    }
+
+    if(is_digit)
+        indicate +=1;
+    if(is_lower)
+        indicate+=1;
+    if(is_special_car)
+        indicate+=2;
+    if(is_uper)
+        indicate+=1;
+    if(len_pass>=min_len)
+        indicate+=2;
+        
+    return indicate;
 }
