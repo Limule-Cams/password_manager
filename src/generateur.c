@@ -1,24 +1,20 @@
-#include"code.h"
-
+#include "../include/code.h"
+   
 
 int random_generate(){
     // srand(time(NULL));
-    return rand()%96 +1; 
-}
+    return rand()%96 +1;
+}                                                       
 
-/* 
- * cette fonction génère aléatoirement un mot de passe de longueur N
- *dans un tableau ici asci qui est généré dans la boucle for
- */
 char* password_generate(){
     int i,c=0;
     char  asci[96];
     for(i=0; i<96; i++)
         asci[i]=i+32;
-    char  *pwd = malloc(sizeof(char)*PASSWORD_LENGTH);
+    char  *pwd = malloc(sizeof(char)*N);
     if( pwd!=NULL){
         srand(time(NULL));
-        for(i=0; i<PASSWORD_LENGTH ; i++){
+        for(i=0; i<N; i++){
             c=random_generate();
             pwd[i] = asci[c];
         }
@@ -33,10 +29,12 @@ char* password_generate(){
 // fonction pour initialiser la type Info
 
 Info* initialise(char *username, char *description, char *pwd){
+
     Info *element = malloc(sizeof(Info));
+    
     if(element==NULL){
         fprintf(stdout, "erreur d'allocation fonction init");
-        exit(1);
+        return NULL;
    }
     strcpy(element->nom, username);
     strcpy(element->description, description);
@@ -48,21 +46,26 @@ Info* initialise(char *username, char *description, char *pwd){
 // fonction pour enregistrer le type info dans un fichier
 
 int add_pass(const char *file, Info *data_write){
+
     FILE *myfile = NULL;  
     myfile = fopen(file, "ab");
+
     if(myfile ==NULL){
         fprintf(stdout," erreur d'ouverture de fichier");
-        return 1;
+        free(data_write);
+        return -1;
     }
     if(fwrite(data_write, sizeof(Info), 1, myfile)!=1){;
 
         perror("erreur d'ecriture de donnees");
+        free(data_write);
         fclose(myfile);
-        return 1;
+        return -1;
     }
     // fermer le fichier 
     fclose(myfile);
-    return 0;
+    free(data_write);
+    return 1;
 }
 
 // fonction pour générer automatiquement le champ id du type Info
@@ -176,7 +179,7 @@ int remove_pass(const char *file, int id) {
         return -1;
     }
 
-    return 0;
+    return 1;
 }
 
 int search_(char *file, char *name){
@@ -191,6 +194,8 @@ int search_(char *file, char *name){
     while(fread(&user, sizeof(Info), 1, fic)==1){
         if(strcmp(user.nom, name)){
             fclose(fic);
+            printf("nom d'utilisateur trouver");
+            printf("%s  %s  %s", user.nom, user.description, user.passwd);
             return 1;
         }
     }
@@ -198,30 +203,41 @@ int search_(char *file, char *name){
     return 0;
 }
 
+int change_password(char *file, int id, char *pwd) {
 
-int change_password(char *file, char *name, int id, Info new_info){
-    
-    FILE *fic = NULL;
-    int size_data = search_(file, name);
-
-    if((fic = fopen(file, "rb+"))==NULL){
-            perror("erreur d'ouverture");
-            return -1;
+    FILE *fic = fopen(file, "rb+");
+    if (fic == NULL) {
+        perror("Erreur d'ouverture");
+        return -1;
     }
+
     Info user;
-    long position;
-    while(fread(&user, sizeof(Info), 1, fic)==1){
-        if(strcmp(user.nom, name)==0 && user.id==id){
-            position = ftell(fic) - sizeof(Info);
+    while (fread(&user, sizeof(Info), 1, fic) == 1) {
+        if (user.id == id) {
+            char nom[MAX_USERNAME_LENGTH];
+            char description[MAX_DESCRIPTION_LENGTH];
+            strncpy(nom, user.nom, sizeof(user.nom));
+            strncpy(description, user.description, sizeof(user.description));
+
+            // initialiser un nouvel élément avec le nouveau mot de passe
+            Info *new_info = initialise(nom, description, pwd);
+
+            // aller à la position dans le fichier et écrire le nouvel élément en remplaçant l'ancien
+            long position = ftell(fic) - sizeof(Info);
             fseek(fic, position, SEEK_SET);
-            fwrite(&new_info, sizeof(Info), 1, fic);
+            fwrite(new_info, sizeof(Info), 1, fic);
+
             fclose(fic);
-            return 0; 
+            free(new_info);
+            return 1;
         }
     }
 
-    return 0;
+    fclose(fic);
+    return -1;
 }
+
+
 
 int export_file(const char *myfile, const char *file){
     FILE *fic_r = NULL, *fic_w = NULL;

@@ -7,10 +7,12 @@
 #include<time.h>
 #include<unistd.h>
 #include<ctype.h>
+#define SIZE_NAME 35
+#define P_LEN 30
 
 typedef struct{
-    char name[20];
-    char password[30];
+    char name[SIZE_NAME];
+    char password[P_LEN];   
     char file[10];
 }Info_con;
 
@@ -19,9 +21,11 @@ typedef enum{
     true
 }bool;
 
-void save_user(const char *name, const char *password, const  char *myfile);
-int search_(const char *file, const char *name, const char *password);
-int change_password(char *file, char *name, char *password, Info_con new_info);
+Info_con* search_log(const char *file, const char *name, const char *password);
+bool save_user(const char *name, const char *password, const  char *myfile);
+int change_password_u(char *file, char *name, char *pwd);
+bool save_user(const char *name, const char *password, const char *myfile);
 int checkPasswordStrength(const char *password);
+void help_();
 
 #endif

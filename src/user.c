@@ -1,37 +1,39 @@
-#include "user.h"
+#include "../include/user.h"
 
-int search_(const char *file, const char *name, const char *password) {
+Info_con* search_log(const char *file, const char *name, const char *password){
     // fonction servant pour la recherche et la connexion suivant la valeur de password
-    Info_con user;
+    Info_con *user;
+    if((user = malloc(sizeof(Info_con)))==NULL)
+        return NULL;
+    
     FILE *fic = fopen(file, "rb");
     if(fic == NULL) {
-        perror("Erreur d'ouverture du fichier");
-        return -1;
+        free(user);
+        return NULL;
     }
 
-    while(fread(&user, sizeof(Info_con), 1, fic) == 1) {
-        if(strcmp(user.name, name) == 0) {
+    while(fread(user, sizeof(Info_con), 1, fic) == 1) {
+        if(strcmp(user->name, name) == 0) {
             // si aucun mot de passe n'est fourni, retourner directement l'utilisateur trouvé
-            if (password == NULL || strcmp(user.password, password) == 0) {
+            if (password == NULL || strcmp(user->password, password) == 0) {
                 fclose(fic);
-                return 1; // utilisateur et ou password trouvé 
+                return user; // utilisateur et ou password trouvé 
             }
         }
     }
 
     fclose(fic);
-    return -1; // Utilisateur non trouvé
+    return NULL; // Utilisateur non trouvé
 }
 
 
 
-void save_user(const char *name, const char *password, const char *myfile) {
+bool save_user(const char *name, const char *password, const char *myfile) {
 
     FILE *fic = NULL;
     Info_con user1;
-    Info_con existing_user;
 
-    if(search_(myfile, name, NULL)==1){
+    if(!(search_log(myfile, name, NULL))){
         fprintf(stdout, "erreur nom d'utilisateur existant\n ");
         exit(EXIT_FAILURE);
     }
@@ -50,18 +52,17 @@ void save_user(const char *name, const char *password, const char *myfile) {
         exit(EXIT_FAILURE);
     }
 
-    // Copie du nom d'utilisateur et du mot de passe
-    strncpy(user1.name, name, sizeof(user1.name) - 1);
-    user1.name[sizeof(user1.name) - 1] = '\0'; // Assurer une terminaison nulle
-
     /*
      * ici vous pouvez implémenter votre mécanisme de hachage
      * ou directement appelé votre fonction pour hacher le mot de passe avant de le sauvegarder
     */
+
+    // copie du nom d'utilisateur et du mot de passe
+    // et  ajouter le caractere de fin de chaine
+    strncpy(user1.name, name, sizeof(user1.name) - 1);
+    user1.name[sizeof(user1.name) - 1] = '\0'; 
     strncpy(user1.password, password, sizeof(user1.password) - 1);
     user1.password[sizeof(user1.password) - 1] = '\0'; 
-
-    // Copie des premiers 4 caractères de name dans user1->file
     strncpy(user1.file, name, 4);
     user1.file[4] = '\0'; 
 
@@ -72,7 +73,7 @@ void save_user(const char *name, const char *password, const char *myfile) {
     if (fwrite(&user1, sizeof(Info_con), 1, fic) != 1) {
         perror("erreur lors de l'écriture dans le fichier");
         fclose(fic);
-        exit(EXIT_FAILURE);
+        return false;
     }
 
     // Ajout d'un saut de ligne dans le fichier
@@ -80,32 +81,40 @@ void save_user(const char *name, const char *password, const char *myfile) {
 
     // Fermeture du fichier
     fclose(fic);
+    return true;
 }
 
 
 
-int change_password(char *file, char *name, char *password, Info_con new_info){
-    
-    FILE *fic = NULL;
+int change_password_u(char *file, char *name, char *pwd) {
 
-
-    if((file = fopen(file, "rb+")==NULL)){
-            perror("erreur d'ouverture");
-            return -1;
+    FILE *fic = fopen(file, "rb+");
+    if (fic == NULL) {
+        perror("Erreur d'ouverture");
+        return -1;
     }
+
     Info_con user;
-    long position;
-    while(fread(&user, sizeof(Info_con), 1, file)==1){
-        if(strcmp(user.name, name)){
-            position = ftell(fic) - sizeof(Info_con);
+    while (fread(&user, sizeof(Info_con), 1, fic) == 1) {
+        if (user.name == name) {
+            char nom[SIZE_NAME];
+            strncpy(nom, user.name, sizeof(user.name));
+
+            Info_con new_info ;
+            strncpy(new_info.name, name, sizeof(new_info.name));
+            strncpy(new_info.password, pwd, sizeof(new_info.password));
+
+            // aller à la position dans le fichier et écrire le nouvel élément en remplaçant l'ancien
+            long position = ftell(fic) - sizeof(Info_con);
             fseek(fic, position, SEEK_SET);
             fwrite(&new_info, sizeof(Info_con), 1, fic);
+
             fclose(fic);
-            return 0; 
+            return 1;
         }
     }
-
-    return 0;
+    fclose(fic);
+    return -1;
 }
 
 int checkPasswordStrength(const char *password){
@@ -129,7 +138,7 @@ int checkPasswordStrength(const char *password){
         else if(ispunct(c))
             is_special_car = true;
         else{
-            char no_valide[] = "éèeêàâûîôùïö";
+            char no_valide[] = "éèêàâûîôùïö";
             if(strchr(no_valide, c))
                 return -1;
         }
@@ -147,4 +156,8 @@ int checkPasswordStrength(const char *password){
         indicate+=2;
         
     return indicate;
+}
+
+void help_(){
+    printf(" fff ");
 }
