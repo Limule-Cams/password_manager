@@ -1,7 +1,7 @@
 #include "../include/user.h"
 
 Info_con* search_log(const char *file, const char *name, const char *password){
-    // fonction servant pour la recherche et la connexion suivant la valeur de password
+    
     Info_con *user;
     if((user = malloc(sizeof(Info_con)))==NULL)
         return NULL;
@@ -17,13 +17,13 @@ Info_con* search_log(const char *file, const char *name, const char *password){
             // si aucun mot de passe n'est fourni, retourner directement l'utilisateur trouvé
             if (password == NULL || strcmp(user->password, password) == 0) {
                 fclose(fic);
-                return user; // utilisateur et ou password trouvé 
+                return user; 
             }
         }
     }
 
     fclose(fic);
-    return NULL; // Utilisateur non trouvé
+    return NULL; 
 }
 
 
@@ -33,21 +33,18 @@ bool save_user(const char *name, const char *password, const char *myfile) {
     FILE *fic = NULL;
     Info_con user1;
 
-    if(!(search_log(myfile, name, NULL))){
-        fprintf(stdout, "erreur nom d'utilisateur existant\n ");
+    if((search_log(myfile, name, NULL))!=NULL){
         exit(EXIT_FAILURE);
     }
 
-    // Ouvrir le fichier en mode ajout
     fic = fopen(myfile, "ab");
     if (fic == NULL) {
-        perror("erreur lors de l'ouverture du fichier");
         exit(EXIT_FAILURE);
     }
 
     // Vérification de la longueur du nom d'utilisateur
     if (strlen(name) < 4) {
-        perror("nom d'utilisateur < 4");
+        fprintf(stdout,"nom d'utilisateur < 4\n");
         fclose(fic);
         exit(EXIT_FAILURE);
     }
@@ -69,17 +66,13 @@ bool save_user(const char *name, const char *password, const char *myfile) {
     // Concaténation de ".pass" à user1->file 
     strcat(user1.file, ".pass");
 
-    // Écriture de user1 dans le fichier
     if (fwrite(&user1, sizeof(Info_con), 1, fic) != 1) {
         perror("erreur lors de l'écriture dans le fichier");
         fclose(fic);
         return false;
     }
 
-    // Ajout d'un saut de ligne dans le fichier
     fputc('\n', fic);
-
-    // Fermeture du fichier
     fclose(fic);
     return true;
 }
@@ -90,32 +83,28 @@ int change_password_u(char *file, char *name, char *pwd) {
 
     FILE *fic = fopen(file, "rb+");
     if (fic == NULL) {
-        perror("Erreur d'ouverture");
         return -1;
     }
 
     Info_con user;
-    while (fread(&user, sizeof(Info_con), 1, fic) == 1) {
-        if (user.name == name) {
-            char nom[SIZE_NAME];
-            strncpy(nom, user.name, sizeof(user.name));
 
-            Info_con new_info ;
-            strncpy(new_info.name, name, sizeof(new_info.name));
-            strncpy(new_info.password, pwd, sizeof(new_info.password));
+     while (fread(&user, sizeof(Info_con), 1, fic) == 1) {
+        if (strcmp(user.name, name) == 0) {
+            strcpy(user.password, pwd);
 
             // aller à la position dans le fichier et écrire le nouvel élément en remplaçant l'ancien
             long position = ftell(fic) - sizeof(Info_con);
             fseek(fic, position, SEEK_SET);
-            fwrite(&new_info, sizeof(Info_con), 1, fic);
-
+            fwrite(&user, sizeof(Info_con), 1, fic);
             fclose(fic);
             return 1;
         }
     }
+    
     fclose(fic);
     return -1;
 }
+
 
 int checkPasswordStrength(const char *password){
     int min_len = 8;
@@ -159,5 +148,5 @@ int checkPasswordStrength(const char *password){
 }
 
 void help_(){
-    printf(" fff ");
+    printf(" -s sing in \n-l loggin\n -h help\n -c change password\n");
 }

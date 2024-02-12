@@ -23,7 +23,7 @@ typedef struct Info{
  
 int random_generate();
 int id_generator(const char *file);
-Info* initialise(char *username, char *description, char *pwd);
+Info* initialise(char *username, char *description, char *pwd, const char *file);
 char* password_generate(); //0
 int add_pass(const char *file, Info *data_write); //1
 int remove_pass(const char *file, int id); //2

@@ -10,127 +10,153 @@ int main(int argc, char *argv[])
 
     }else{
         
-        if(strcmp(argv[1], "-h"))
+        if(strcmp(argv[1], "-h")==0){
+            printf(" la valeur de argc ; %d ", argc);
             help_();
+            printf("%d", argc);
+        }
+        else if (strcmp(argv[1], "-s")==0)
+        {
+            if(argc!=4){
+                help_();
+                printf("%d", argc);}
+            else{
+                if(save_user(argv[2], argv[3], myfile)){
+                    printf("inscription valide \nconnectez vous\n");
+                }else{
+                    printf("inscription echouer\n");
+                    printf("\t\t-s  name password\n");
+                }
+            }
+        }
 
-        else if (strcmp(argv[1], "-s"))
+        else if (strcmp(argv[1], "-c")==0)
         {
             if(argc!=4)
                 help_();
             else{
-                if(save_user(argv[2], argv[3], myfile)){
-                    printf("inscription valide \nconnectez vous\n");
-                }
-                printf("inscription echouer\n");
-                printf("\t\t-s  name password\n");
+                    if(change_password_u(myfile,argv[2], argv[3])==-1){
+                        printf("erreur de changement de password\n");
+                    }
+                   printf("changement reussi : %s", argv[3]);
             }
         }
         
-        else if(strcmp(argv[1], "-l")){
+        else if(strcmp(argv[1], "-l")==0){
 
-            if(argc!=4)
-                help_();
+            if(argc!=4){
+                printf("%d", argc);
+                help_();}
             else{
                 if (access(myfile, F_OK) != -1) {
 
-                    Info_con *info_user = search_log(myfile, argv[2], argv[3]);
-                    if(info_user==NULL){
-                        printf("oups information ou format incorecte\n");
-                        printf("\t\t-l  name password\n");
-                    }
-                    printf("\nsucces authentification\n");
-                    char *file = info_user->file;
-                    int c = 0;
-                    printf("\n\n\t\t\tHello, %s    (--) \n\n", info_user->name);
-                    free(info_user);
-                    printf("Que voulez-vous faire ? : ");
-                    help_();
-                    scanf("%d", &c);
-                    switch (c)
-                    {
-                        case 0:
-                            char *passe = password_generate();
-                            printf("\t\t {password_generate}: %s", passe);
-                            free(passe);
-                            break;
-                        case 1:
-                            char nom[MAX_USERNAME_LENGTH], description[MAX_DESCRIPTION_LENGTH];
+                    if (access(myfile, W_OK) != -1) {
 
-                            printf("\nEntrer une description pour le mot de passe :... ");
-                            fgets(description, sizeof(description), stdin);
-                            description[strcspn(description,"\n")]='\0';
-                            
-                            printf("\nLe nom d'utilisateur pour le mot de passe :... ");
-                            fgets(nom, sizeof(nom), stdin);
-                            nom[strcspn(nom,"\n")]='\0';
-                            
-                            char* pass  = password_generate();
-                            Info *data = initialise(nom, description, pass);
-                            if(data==NULL){
-                                printf("erreur d'enregistrement des donnees");
-                                exit(EXIT_FAILURE);
-                            }
-                            if(add_pass(file, data)==-1)
-                                printf("erreur de sauvegarde");
-                            printf("sauvegarde OK");
+                        if (access(myfile, R_OK) != -1) {
 
-                            break;
-                        case 2:
-                            int num = 0;
-                            printf("veiller saisir l'id du password à supprimer : ");
-                            scanf("%d", &num);
-                            if(!(isdigit(num))){
-                                printf("entre incorrecte\n");
-                                exit(EXIT_FAILURE);
+                            Info_con *info_user = search_log(myfile, argv[2], argv[3]);
+                            if(info_user==NULL){
+                                printf("oups information ou format incorecte\n");
+                                printf("\t\t-l  name password\n");
                             }
-                            if(remove_pass(file, num)==1)
-                                printf("suppression reussie\n");
-                            break;
-                        case 3:
-                            char pwd[N], descript[MAX_DESCRIPTION_LENGTH];
-                            int id_ = 0;
-                            printf("saisir l'id du password à changer : ");
-                            scanf("%d", &id_);
+                            printf("\nsucces authentification\n");
+                            char file[11];
+                            strcpy(file, info_user->file);
+                            file[sizeof(info_user->file) - 1] = '\0';
+                            int c = 0;
+                            printf("\n\n\t\t\tHello, %s    (--) \n\n", info_user->name);
+                            free(info_user);
+                            printf("Que voulez-vous faire ? : ");
+                            help_();
+                            scanf("%d", &c);
                             getchar();
-                            if(!(isdigit(id_))){
-                                printf("entre incorrecte\n");
-                                exit(EXIT_FAILURE);
-                            }
-                            printf("saisir le mot de passe :");
-                            fgets(descript, sizeof(descript), stdin);
-                            description[strcspn(descript,"\n")]='\0';
-                            if(change_password(file, id_, pwd)!=1)
-                                printf("\t\terreur\n");
-                            printf("\t\t changement reussi");
+                            switch (c)
+                            {
+                                case 0:
+                                    char *passe = password_generate();
+                                    printf("\t\t {password_generate}: %s\n", passe);
+                                    free(passe);
+                                    break;
+                                case 1:
+                                    char nom[MAX_USERNAME_LENGTH], description[MAX_DESCRIPTION_LENGTH];
 
-                            break;
-                        case 4:
-                            read_all_file(file);
-                            break;
-                        case 5:
-                            char name[MAX_USERNAME_LENGTH];
-                            printf("\nEntrer le nom pour le nom :... ");
-                            fgets(name, sizeof(nom), stdin);
-                            description[strcspn(nom,"\n")]='\0';
-                            search_(file, nom);
-                            break;
-                        case 6:
-                            char path_[30];
-                            printf("donner le nom du fichier à exporter");
-                            fgets(path_, sizeof(path_), stdin);
-                            path_[strcspn(path_,"\n")]='\0';
-                            export_file(file,path_);
-                            break;
-                        case 7:
-                            printf("donner le nom du fichier à importer");
-                            fgets(path_, sizeof(path_), stdin);
-                            path_[strcspn(path_,"\n")]='\0';
-                            import_file(path_, file);
-                            break;
-                        
-                        default:
-                            printf("pffffff");
-                            break;
+                                    printf("\nEntrer une description pour le mot de passe :... ");
+                                    fgets(description, sizeof(description), stdin);
+                                    description[strcspn(description,"\n")]='\0';
+                                    
+                                    printf("\nLe nom d'utilisateur pour le mot de passe :... ");
+                                    fgets(nom, sizeof(nom), stdin);
+                                    nom[strcspn(nom,"\n")]='\0';
+                                    
+                                    char* pass  = password_generate();
+                                    Info *data = initialise(nom, description, pass, file);
+                                    if(data==NULL){
+                                        printf("erreur d'enregistrement des donnees");
+                                        exit(EXIT_FAILURE);
+                                    }
+                                    if(add_pass(file, data)==-1)
+                                        printf("erreur de sauvegarde");
+                                    printf("sauvegarde OK");
+
+                                    break;
+                                case 2:
+                                    int num = 0;
+                                    printf("veiller saisir l'id du password à supprimer : ");
+                                    if(scanf("%d", &num)!=1){
+                                        printf("entre incorrecte\n");
+                                        exit(EXIT_FAILURE);
+                                    }
+                                    if(remove_pass(file, num)==1)
+                                        printf("suppression reussie\n");
+                                    else
+                                        printf("erreur");
+                                    break;
+                                case 3:
+                                    char pwd[N];
+                                    int id_ = 0;
+                                    printf("saisir l'id du password à changer : ");
+                                    if(scanf("%d", &id_)!=1){
+                                        printf("entre incorrecte\n");
+                                        exit(EXIT_FAILURE);
+                                    }
+                                    getchar();
+                                    printf("saisir le mot de passe :");
+                                    fgets(pwd, sizeof(pwd), stdin);
+                                    pwd[strcspn(pwd,"\n")]='\0';
+                                    if(change_password(file, id_, pwd)!=1)
+                                        printf("\t\terreur\n");
+                                    printf("\t\t changement reussi");
+
+                                    break;
+                                case 4:
+                                    read_all_file(file);
+                                    break;
+                                case 5:
+                                    char name[MAX_USERNAME_LENGTH];
+                                    printf("\nEntrer le nom pour le nom :... ");
+                                    fgets(name, sizeof(nom), stdin);
+                                    name[strcspn(name,"\n")]='\0';
+                                    search_(file, name);
+                                    break;
+                                case 6:
+                                    char path_[30];
+                                    printf("donner le nom du fichier à exporter");
+                                    fgets(path_, sizeof(path_), stdin);
+                                    path_[strcspn(path_,"\n")]='\0';
+                                    export_file(file,path_);
+                                    break;
+                                case 7:
+                                    printf("donner le nom du fichier à importer");
+                                    fgets(path_, sizeof(path_), stdin);
+                                    path_[strcspn(path_,"\n")]='\0';
+                                    import_file(path_, file);
+                                    break;
+                                
+                                default:
+                                    printf("pffffff");
+                                    break;
+                            }
+                        }
                     }
 
                 }

@@ -26,9 +26,7 @@ char* password_generate(){
 }
 
 
-// fonction pour initialiser la type Info
-
-Info* initialise(char *username, char *description, char *pwd){
+Info* initialise(char *username, char *description, char *pwd, const char *file){
 
     Info *element = malloc(sizeof(Info));
     
@@ -36,14 +34,19 @@ Info* initialise(char *username, char *description, char *pwd){
         fprintf(stdout, "erreur d'allocation fonction init");
         return NULL;
    }
+    
+    int a = id_generator(file);
+    if(a==-1){
+        free(element);
+        return NULL;
+    }
+    element->id = a;
     strcpy(element->nom, username);
     strcpy(element->description, description);
     strcpy(element->passwd, pwd);
     return element;
 }
 
-
-// fonction pour enregistrer le type info dans un fichier
 
 int add_pass(const char *file, Info *data_write){
 
@@ -68,19 +71,22 @@ int add_pass(const char *file, Info *data_write){
     return 1;
 }
 
-// fonction pour générer automatiquement le champ id du type Info
 
 int id_generator(const char *file) {
     FILE *fic = NULL;
     Info data_read;
     int max_id = 0;
 
-    // Ouvrir le fichier en mode lecture
+    if (access(file, F_OK) == -1) {    
+        return 1;
+    }
+
     fic = fopen(file, "rb");
     if (fic == NULL) {
         perror("Erreur d'ouverture du fichier");
         return -1;
     }
+
 
     // Parcourir le fichier pour trouver le plus grand ID
     while (fread(&data_read, sizeof(Info), 1, fic) == 1) {
@@ -92,17 +98,16 @@ int id_generator(const char *file) {
   
     fclose(fic);
 
-    // Si le fichier est vide, retourner l'ID 1
+    // si le fichier est vide, retourner l'ID 1
     if (max_id == 0) {
-        return 1;
+        fprintf(stdout, "erreur de la fonction id_generator");
     }
 
-    // Sinon, retourner le plus grand ID trouvé plus un
+    // sinon, retourner l'id suivant
     return max_id + 1;
 }
 
 
-// fonction de lecture du type Info
 void read_all_file(const char *file){
     FILE *fic = NULL;
     Info tmp ;
@@ -116,7 +121,7 @@ void read_all_file(const char *file){
     while(fread(&tmp, sizeof(Info), 1, fic)==1){
     
  		// afficher sur la sortie standard les champs du type 
-        fprintf(stdout, " \nDESCRIPTION :  %s ; \nUSERNAME :  %s  ;\nPASSWORD : %s", tmp.description, tmp.nom, tmp.passwd);
+        fprintf(stdout, " \nId: %d  ;\nDESCRIPTION :  %s ; \nUSERNAME :  %s  ;\nPASSWORD : %s", tmp.id, tmp.description, tmp.nom, tmp.passwd);
         printf("\n_____________________________________________________________________________________________________________________________________________________\n");
 
     }
@@ -125,11 +130,7 @@ void read_all_file(const char *file){
    
 }
 
-/*
-la fonction remove_pass verifie la correspondance entre un id et le champ id
-si ils sont identiques on copie le fichier actuel dans un autre fichier sans 
-la ligne ou id = info-id
-*/
+
 int remove_pass(const char *file, int id) {
     FILE *fic = NULL, *new_fic = NULL;
     Info *element = malloc(sizeof(Info));
@@ -182,8 +183,9 @@ int remove_pass(const char *file, int id) {
     return 1;
 }
 
+
 int search_(char *file, char *name){
-    Info user;
+    Info user, user1;
     FILE *fic = NULL;
     fic = fopen(file, "rb");
     if((fic==NULL)){
@@ -192,16 +194,21 @@ int search_(char *file, char *name){
     }
 
     while(fread(&user, sizeof(Info), 1, fic)==1){
+        
         if(strcmp(user.nom, name)){
+            long pos = ftell(fic) - sizeof(Info);
+            fseek(fic, pos, SEEK_SET);
+            fread(&user1, sizeof(Info), 1, fic);
             fclose(fic);
-            printf("nom d'utilisateur trouver");
-            printf("%s  %s  %s", user.nom, user.description, user.passwd);
+            printf("nom d'utilisateur trouver\n");
+            printf("[ %s ]     [ %s ]     [ %s ]\n", user1.nom, user1.description, user1.passwd);
             return 1;
         }
     }
     fclose(fic);
-    return 0;
+    return -1;
 }
+
 
 int change_password(char *file, int id, char *pwd) {
 
@@ -220,7 +227,7 @@ int change_password(char *file, int id, char *pwd) {
             strncpy(description, user.description, sizeof(user.description));
 
             // initialiser un nouvel élément avec le nouveau mot de passe
-            Info *new_info = initialise(nom, description, pwd);
+            Info *new_info = initialise(nom, description, pwd, file);
 
             // aller à la position dans le fichier et écrire le nouvel élément en remplaçant l'ancien
             long position = ftell(fic) - sizeof(Info);
@@ -236,7 +243,6 @@ int change_password(char *file, int id, char *pwd) {
     fclose(fic);
     return -1;
 }
-
 
 
 int export_file(const char *myfile, const char *file){
@@ -266,6 +272,7 @@ int export_file(const char *myfile, const char *file){
     return 0;
 }
 
+
 void import_file(const char *file_path, const char *master_password){
     FILE *fic_r = NULL;
     fic_r = fopen(file_path, "r");
@@ -283,7 +290,7 @@ void import_file(const char *file_path, const char *master_password){
 
     while (fscanf(fic_r, "%s %s %s", username, description, password)==3)
     {
-        Info *user = initialise(username, description, password);
+        Info *user = initialise(username, description, password, file_path);
         if(user!=NULL){
             add_pass(master_password, user);
         }
