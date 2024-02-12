@@ -148,5 +148,13 @@ int checkPasswordStrength(const char *password){
 }
 
 void help_(){
-    printf(" -s sing in \n-l loggin\n -h help\n -c change password\n");
+    printf(
+        "\n\n__________________________________________________________________"
+        "\n\t!-h pour l'aide { ./main -h }                                 |"
+        "\n\t!-s enregistre un utilisateur { ./main -s username password } |"
+        "\n\t!-s changer de password { ./main -c username password         |"
+        "\n\t!-l se connecter { ./main -s username password }              |"
+        "\n--------------------------------------------------------------------\n\n"
+
+    );
 }

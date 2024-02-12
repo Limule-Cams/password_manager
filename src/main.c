@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
                     if(change_password_u(myfile,argv[2], argv[3])==-1){
                         printf("erreur de changement de password\n");
                     }
-                   printf("changement reussi : %s", argv[3]);
+                   printf("changement reussi : %s\n", argv[3]);
             }
         }
         
@@ -56,19 +56,21 @@ int main(int argc, char *argv[])
 
                             Info_con *info_user = search_log(myfile, argv[2], argv[3]);
                             if(info_user==NULL){
-                                printf("oups information ou format incorecte\n");
-                                printf("\t\t-l  name password\n");
+                                printf("\t\toups information ou format incorecte\n");
+                                printf("\t\t-l name password\n");
                             }
                             printf("\nsucces authentification\n");
                             char file[11];
                             strcpy(file, info_user->file);
                             file[sizeof(info_user->file) - 1] = '\0';
                             int c = 0;
-                            printf("\n\n\t\t\tHello, %s    (--) \n\n", info_user->name);
+                            system("clear");
+                            printf("\n\n\t\t\t\t\tHello, %s   bienvenue ici !(--)! \n\n", info_user->name);
                             free(info_user);
                             printf("Que voulez-vous faire ? : ");
-                            help_();
-                            scanf("%d", &c);
+                            help_I();
+                            if(scanf("%d", &c)!=1)
+                                printf("entree incorrecte");
                             getchar();
                             switch (c)
                             {

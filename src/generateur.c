@@ -117,13 +117,14 @@ void read_all_file(const char *file){
         perror("errreur d'ouverture du fichier");
         return;
     }
-    
+    fprintf(stdout, "  id \t  DESCRIPTION  \t\t  USERNAME  \t\t PASSWORD\n"
+                    "----------------------------------------------------\n\n\n"
+    );
     while(fread(&tmp, sizeof(Info), 1, fic)==1){
     
  		// afficher sur la sortie standard les champs du type 
-        fprintf(stdout, " \nId: %d  ;\nDESCRIPTION :  %s ; \nUSERNAME :  %s  ;\nPASSWORD : %s", tmp.id, tmp.description, tmp.nom, tmp.passwd);
-        printf("\n_____________________________________________________________________________________________________________________________________________________\n");
-
+        fprintf(stdout, "  | %d |\t  | %s | \t\t\t | %s | \t\t | %s |\n", tmp.id, tmp.nom, tmp.description, tmp.passwd);
+        printf("---------------------------------------------------------------------------------------------------\n");
     }
     
     fclose(fic);
@@ -298,4 +299,18 @@ void import_file(const char *file_path, const char *master_password){
 
     fclose(fic_r);
     
+}
+
+void help_I(){
+    printf(
+        "\n-0 genere un mot de passe"
+        "\n-1 enregistre les donnees saisies"
+        "\n-2 supprime le password le username et la description"
+        "\n-3 changement de password"
+        "\n-4 affiche tout les donnees"
+        "\n-5 recherche un password par son nom"
+        "\n-6 export le fichier password au format csv"
+        "\n-7 import un fichier cvs dans notre sauvegarde personnelle"
+        "\n    :->$  "
+    );
 }
