@@ -77,7 +77,8 @@ int id_generator(const char *file) {
     Info data_read;
     int max_id = 0;
 
-    if (access(file, F_OK) == -1) {    
+    if (access(file, F_OK) == -1) {  
+        fprintf(stdout, "erreur de la acces") ;
         return 1;
     }
 
@@ -196,13 +197,12 @@ int search_(char *file, char *name){
 
     while(fread(&user, sizeof(Info), 1, fic)==1){
         
-        if(strcmp(user.nom, name)){
+        if(strcmp(user.nom, name)==0){
             long pos = ftell(fic) - sizeof(Info);
             fseek(fic, pos, SEEK_SET);
             fread(&user1, sizeof(Info), 1, fic);
             fclose(fic);
-            printf("nom d'utilisateur trouver\n");
-            printf("[ %s ]     [ %s ]     [ %s ]\n", user1.nom, user1.description, user1.passwd);
+            fprintf(stdout,"[ %s ]     [ %s ]     [ %s ]\n", user1.nom, user1.description, user1.passwd);
             return 1;
         }
     }
@@ -264,7 +264,7 @@ int export_file(const char *myfile, const char *file){
         fclose(fic_r);
         return -1;
     }
-    fputs("id  description  nom  password\n", fic_w);
+    fputs("id  description  nom  password", fic_w);
     while(fread(&user, sizeof(Info), 1, fic_r)==1){
         fprintf(fic_w, "%s %s %s\n", user.description, user.nom, user.passwd);
     }
@@ -285,11 +285,13 @@ void import_file(const char *file_path, const char *master_password){
     char username[MAX_USERNAME_LENGTH];
     char description[MAX_DESCRIPTION_LENGTH];
     char password[PASSWORD_LENGTH];
+    char ch [] = "id  description  nom  password";
 
-    size_t taille_premiere_ligne = strlen("id description nom password\n");
+    size_t taille_premiere_ligne = strlen(ch);
     fseek(fic_r, taille_premiere_ligne, SEEK_SET);
+    //fseek(fic_r,1,SEEK_CUR);
 
-    while (fscanf(fic_r, "%s %s %s", username, description, password)==3)
+    while (fscanf(fic_r, "%s %s %s", description, username, password)==3)
     {
         Info *user = initialise(username, description, password, file_path);
         if(user!=NULL){
@@ -303,14 +305,18 @@ void import_file(const char *file_path, const char *master_password){
 
 void help_I(){
     printf(
-        "\n-0 genere un mot de passe"
-        "\n-1 enregistre les donnees saisies"
-        "\n-2 supprime le password le username et la description"
-        "\n-3 changement de password"
-        "\n-4 affiche tout les donnees"
-        "\n-5 recherche un password par son nom"
-        "\n-6 export le fichier password au format csv"
-        "\n-7 import un fichier cvs dans notre sauvegarde personnelle"
-        "\n    :->$  "
+        "\n\n\t-0 genere un mot de passe"
+        "\n\t-1 enregistre les donnees saisies"
+        "\n\t-2 supprime le password le username et la description"
+        "\n\t-3 changement de password"
+        "\n\t-4 affiche tout les donnees"
+        "\n\t-5 recherche un password par son nom"
+        "\n\t-6 export le fichier password au format csv"
+        "\n\t-7 import un fichier cvs dans notre sauvegarde personnelle"
+        "\n\n:->$  "
     );
+}
+
+void quitter(){
+    exit(EXIT_SUCCESS);
 }

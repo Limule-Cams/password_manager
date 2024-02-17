@@ -81,6 +81,7 @@ void import_file(const char *file_path, const char *master_password);//7
  */
 
 void help_I();
+void quitter();
 
 #endif
 

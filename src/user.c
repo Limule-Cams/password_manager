@@ -3,12 +3,14 @@
 Info_con* search_log(const char *file, const char *name, const char *password){
     
     Info_con *user;
-    if((user = malloc(sizeof(Info_con)))==NULL)
+    if((user = malloc(sizeof(Info_con)))==NULL){
+        perror("erreu d'alocation");
         return NULL;
-    
+    }
     FILE *fic = fopen(file, "rb");
     if(fic == NULL) {
         free(user);
+        perror("erreur fichier");
         return NULL;
     }
 
@@ -23,6 +25,7 @@ Info_con* search_log(const char *file, const char *name, const char *password){
     }
 
     fclose(fic);
+    free(user);
     return NULL; 
 }
 
@@ -33,15 +36,25 @@ bool save_user(const char *name, const char *password, const char *myfile) {
     FILE *fic = NULL;
     Info_con user1;
 
-    if((search_log(myfile, name, NULL))!=NULL){
-        exit(EXIT_FAILURE);
-    }
 
     fic = fopen(myfile, "ab");
     if (fic == NULL) {
         exit(EXIT_FAILURE);
     }
 
+    fseek(fic, 0, SEEK_END);
+    long pos = ftell(fic);
+    if(pos==0){
+        ;//ne fait rien sinon on verifie les doublons
+    }else{
+
+        if((search_log(myfile, name, NULL))!=NULL){
+            fprintf(stdout, "\nnom d'utilisateur nom valide\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    
     // Vérification de la longueur du nom d'utilisateur
     if (strlen(name) < 4) {
         fprintf(stdout,"nom d'utilisateur < 4\n");
@@ -72,7 +85,7 @@ bool save_user(const char *name, const char *password, const char *myfile) {
         return false;
     }
 
-    fputc('\n', fic);
+    //fputc('\n', fic);
     fclose(fic);
     return true;
 }

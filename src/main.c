@@ -11,15 +11,12 @@ int main(int argc, char *argv[])
     }else{
         
         if(strcmp(argv[1], "-h")==0){
-            printf(" la valeur de argc ; %d ", argc);
             help_();
-            printf("%d", argc);
         }
         else if (strcmp(argv[1], "-s")==0)
         {
-            if(argc!=4){
+            if(argc!=4)
                 help_();
-                printf("%d", argc);}
             else{
                 if(save_user(argv[2], argv[3], myfile)){
                     printf("inscription valide \nconnectez vous\n");
@@ -58,9 +55,10 @@ int main(int argc, char *argv[])
                             if(info_user==NULL){
                                 printf("\t\toups information ou format incorecte\n");
                                 printf("\t\t-l name password\n");
+                                free(info_user);
+                                exit(EXIT_FAILURE);
                             }
-                            printf("\nsucces authentification\n");
-                            char file[11];
+                            char file[11];//
                             strcpy(file, info_user->file);
                             file[sizeof(info_user->file) - 1] = '\0';
                             int c = 0;
@@ -142,20 +140,21 @@ int main(int argc, char *argv[])
                                     break;
                                 case 6:
                                     char path_[30];
-                                    printf("donner le nom du fichier à exporter");
+                                    printf("donner le nom du fichier à exporter : ");
                                     fgets(path_, sizeof(path_), stdin);
                                     path_[strcspn(path_,"\n")]='\0';
                                     export_file(file,path_);
                                     break;
                                 case 7:
-                                    printf("donner le nom du fichier à importer");
+                                    printf("donner le nom du fichier à importer : ");
                                     fgets(path_, sizeof(path_), stdin);
                                     path_[strcspn(path_,"\n")]='\0';
                                     import_file(path_, file);
                                     break;
                                 
                                 default:
-                                    printf("pffffff");
+                                    printf("\n\nvous avez quitter le programme\n");
+                                    quitter();
                                     break;
                             }
                         }
