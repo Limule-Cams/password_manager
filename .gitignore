@@ -9,6 +9,7 @@
 *.db
 *.swp
 *.txt
+*.pass
 
 # Fichiers de configuration locaux
 config.ini
