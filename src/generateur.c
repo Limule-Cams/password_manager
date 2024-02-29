@@ -78,7 +78,6 @@ int id_generator(const char *file) {
     int max_id = 0;
 
     if (access(file, F_OK) == -1) {  
-        fprintf(stdout, "erreur de la acces") ;
         return 1;
     }
 

@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 
                         if (access(myfile, R_OK) != -1) {
 
+
                             Info_con *info_user = search_log(myfile, argv[2], argv[3]);
                             if(info_user==NULL){
                                 printf("\t\toups information ou format incorecte\n");

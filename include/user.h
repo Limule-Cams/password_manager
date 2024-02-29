@@ -7,12 +7,11 @@
 #include<time.h>
 #include<unistd.h>
 #include<ctype.h>
-#define SIZE_NAME 35
-#define P_LEN 30
+#include<sodium.h>
 
 typedef struct{
-    char name[SIZE_NAME];
-    char password[P_LEN];   
+    unsigned char name[crypto_generichash_BYTES];
+    unsigned char password[crypto_generichash_BYTES];   
     char file[10];
 }Info_con;
 

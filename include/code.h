@@ -10,7 +10,8 @@
 #define PASSWORD_LENGTH 64
 #define MAX_USERNAME_LENGTH 40
 #define MAX_DESCRIPTION_LENGTH 50
-#define N 35
+#define N 25
+
 
 typedef struct Info{
     int id;
