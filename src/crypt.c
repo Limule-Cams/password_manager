@@ -112,9 +112,9 @@ int check(void)
 unsigned char hash_pass(unsigned char *pass, size_t len_pass){
     unsigned char hash[crypto_generichash_BYTES];
 
-crypto_generichash(hash, sizeof hash,
+/*crypto_generichash(hash, sizeof hash,
                    pass, len_pass,
                    NULL, 0);
 
 return hash;
-}
+}*/

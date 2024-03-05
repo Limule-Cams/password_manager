@@ -1,5 +1,6 @@
 # Password Manager
 
+Ce projet est actuellement en cours de devéloppement
 Le Password Manager est une application en ligne de commande permettant de gérer et de stocker en toute sécurité vos mots de passe de manière cryptée.
 
 ## Fonctionnalités:
