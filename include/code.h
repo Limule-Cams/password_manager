@@ -1,6 +1,8 @@
 #ifndef CODE_H
 #define CODE_H
 
+
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -10,10 +12,9 @@
 #define PASSWORD_LENGTH 64
 #define MAX_USERNAME_LENGTH 40
 #define MAX_DESCRIPTION_LENGTH 50
-#define N 25
 
-
-typedef struct Info{
+#define PASS 25
+typedef struct{
     int id;
     char description[MAX_DESCRIPTION_LENGTH];
     char nom[MAX_USERNAME_LENGTH];

@@ -1,5 +1,6 @@
 #include "../include/code.h"
 #include "../include/user.h"
+#include "../include/crypt.h"
 
 
 int main(int argc, char *argv[])
@@ -51,7 +52,8 @@ int main(int argc, char *argv[])
 
                         if (access(myfile, R_OK) != -1) {
 
-
+                            char *key = key_genere(argv[2], argv[3]);
+                            printf("%s\n\n", key);
                             Info_con *info_user = search_log(myfile, argv[2], argv[3]);
                             if(info_user==NULL){
                                 printf("\t\toups information ou format incorecte\n");
@@ -65,7 +67,8 @@ int main(int argc, char *argv[])
                             int c = 0;
                             system("clear");
                             printf("\n\n\t\t\t\t\tHello, %s   bienvenue ici !(--)! \n\n", info_user->name);
-                            free(info_user);
+                            printf("la cle : %s\n\n", key);
+                            free(key);
                             printf("Que voulez-vous faire ? : ");
                             help_I();
                             if(scanf("%d", &c)!=1)
@@ -113,7 +116,7 @@ int main(int argc, char *argv[])
                                         printf("erreur");
                                     break;
                                 case 3:
-                                    char pwd[N];
+                                    char pwd[PASS];
                                     int id_ = 0;
                                     printf("saisir l'id du password à changer : ");
                                     if(scanf("%d", &id_)!=1){

@@ -11,10 +11,10 @@ char* password_generate(){
     char  asci[96];
     for(i=0; i<96; i++)
         asci[i]=i+32;
-    char  *pwd = malloc(sizeof(char)*N);
+    char  *pwd = malloc(sizeof(char)*PASS);
     if( pwd!=NULL){
         srand(time(NULL));
-        for(i=0; i<N; i++){
+        for(i=0; i<PASS; i++){
             c=random_generate();
             pwd[i] = asci[c];
         }

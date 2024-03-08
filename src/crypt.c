@@ -2,14 +2,8 @@
 
 #define CHUNK_SIZE 4096
 
-/*unsigned char key_generate(){
-    unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
-    crypto_secretstream_xchacha20poly1305_keygen(key);
-    return key;
-}
-*/
-
-static int encrypt(const char *target_file, const char *source_file,
+static int
+encrypt(const char *target_file, const char *source_file,
         const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES])
 {
     unsigned char  buf_in[CHUNK_SIZE];
@@ -25,9 +19,9 @@ static int encrypt(const char *target_file, const char *source_file,
     fp_s = fopen(source_file, "rb");
     fp_t = fopen(target_file, "wb");
     crypto_secretstream_xchacha20poly1305_init_push(&st, header, key);
-    fwrite(header, 1, sizeof(header), fp_t);
+    fwrite(header, 1, sizeof header, fp_t);
     do {
-        rlen = fread(buf_in, 1, sizeof(buf_in), fp_s);
+        rlen = fread(buf_in, 1, sizeof buf_in, fp_s);
         eof = feof(fp_s);
         tag = eof ? crypto_secretstream_xchacha20poly1305_TAG_FINAL : 0;
         crypto_secretstream_xchacha20poly1305_push(&st, buf_out, &out_len, buf_in, rlen,
@@ -39,7 +33,8 @@ static int encrypt(const char *target_file, const char *source_file,
     return 0;
 }
 
-static int decrypt(const char *target_file, const char *source_file,
+static int
+decrypt(const char *target_file, const char *source_file,
         const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES])
 {
     unsigned char  buf_in[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
@@ -55,66 +50,56 @@ static int decrypt(const char *target_file, const char *source_file,
 
     fp_s = fopen(source_file, "rb");
     fp_t = fopen(target_file, "wb");
-    fread(header, 1, sizeof(header), fp_s);
+    fread(header, 1, sizeof header, fp_s);
     if (crypto_secretstream_xchacha20poly1305_init_pull(&st, header, key) != 0) {
-        /* incomplete header */
-        fclose(fp_t);
-        fclose(fp_s);
-        return ret; 
+        goto ret; /* incomplete header */
     }
     do {
-        rlen = fread(buf_in, 1, sizeof(buf_in), fp_s);
+        rlen = fread(buf_in, 1, sizeof buf_in, fp_s);
         eof = feof(fp_s);
         if (crypto_secretstream_xchacha20poly1305_pull(&st, buf_out, &out_len, &tag,
                                                        buf_in, rlen, NULL, 0) != 0) {
-            fclose(fp_t);
-            fclose(fp_s);
-            return ret; 
+            goto ret; /* corrupted chunk */
         }
         if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL) {
             if (! eof) {
-                 /* end of stream reached before the end of the file */
-                 fclose(fp_t);
-                 fclose(fp_s);
-                 return ret;
+                goto ret; /* end of stream reached before the end of the file */
             }
         } else { /* not the final chunk yet */
             if (eof) {
-                /* end of file reached before the end of the stream */
-                fclose(fp_t);
-                fclose(fp_s);
-                return ret;
+                goto ret; /* end of file reached before the end of the stream */
             }
         }
         fwrite(buf_out, 1, (size_t) out_len, fp_t);
     } while (! eof);
 
-    return 0;
+    ret = 0;
+ret:
+    fclose(fp_t);
+    fclose(fp_s);
+    return ret;
 }
 
-int check(void)
-{
-    unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES];
 
-    if (sodium_init() != 0) {
-        return 1;
+
+char *salt_generate(char *name, int len_name){
+    char *salt = (char*)malloc(sizeof(char)*3);
+    if(salt==NULL){
+        exit(EXIT_FAILURE);
     }
-    crypto_secretstream_xchacha20poly1305_keygen(key);
-    if (encrypt("/tmp/encrypted", "/tmp/original", key) != 0) {
-        return 1;
-    }
-    if (decrypt("/tmp/decrypted", "/tmp/encrypted", key) != 0) {
-        return 1;
-    }
-    return 0;
+    salt[0] = name[0];
+    salt[1] = name[len_name - 1];
+    salt[2] = '\0';
+    return salt;
 }
 
-unsigned char hash_pass(unsigned char *pass, size_t len_pass){
-    unsigned char hash[crypto_generichash_BYTES];
-
-/*crypto_generichash(hash, sizeof hash,
-                   pass, len_pass,
-                   NULL, 0);
-
-return hash;
-}*/
+ char* key_genere(char *name, char *pass){
+    char *key = (char*)malloc(sizeof(char)*9);
+    if(key==NULL){
+        exit(EXIT_FAILURE);
+    }
+    strncpy(key, name, 4);
+    strncat(key, pass, 4);
+    key[8] = '\0';
+    return key;
+}
