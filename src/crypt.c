@@ -2,8 +2,7 @@
 
 #define CHUNK_SIZE 4096
 
-static int
-encrypt(const char *target_file, const char *source_file,
+ int encrypt(const char *target_file, const char *source_file,
         const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES])
 {
     unsigned char  buf_in[CHUNK_SIZE];
@@ -33,8 +32,7 @@ encrypt(const char *target_file, const char *source_file,
     return 0;
 }
 
-static int
-decrypt(const char *target_file, const char *source_file,
+int decrypt(const char *target_file, const char *source_file,
         const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES])
 {
     unsigned char  buf_in[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
@@ -81,25 +79,42 @@ ret:
 }
 
 
-
-char *salt_generate(char *name, int len_name){
-    char *salt = (char*)malloc(sizeof(char)*3);
-    if(salt==NULL){
-        exit(EXIT_FAILURE);
-    }
-    salt[0] = name[0];
-    salt[1] = name[len_name - 1];
-    salt[2] = '\0';
-    return salt;
-}
-
- char* key_genere(char *name, char *pass){
-    char *key = (char*)malloc(sizeof(char)*9);
+ unsigned char* key_genere(char *name, char *pass){
+    int name_len = strlen(name);
+    int message_len = name_len + 5;
+    char message[message_len];
+    char *key = (char*)malloc(sizeof(unsigned char)*crypto_generichash_BYTES);
     if(key==NULL){
         exit(EXIT_FAILURE);
     }
-    strncpy(key, name, 4);
-    strncat(key, pass, 4);
-    key[8] = '\0';
+    strncpy(message, name, name_len);
+    strncat(message, pass, 4);
+    message[message_len] = '\0';
+    crypto_generichash(key, crypto_generichash_BYTES,
+                   message, message_len,
+                   NULL, 0);
+
     return key;
+}
+
+
+
+unsigned char* hash_passwd(unsigned char *key, char *password){
+
+    unsigned char *cypher_text = malloc(sizeof(unsigned char)*crypto_hash_sha256_BYTES);
+    if(cypher_text==NULL){
+        exit(EXIT_FAILURE);
+    }
+
+    crypto_hash_sha256_state state;
+
+    crypto_hash_sha256_init(&state);
+
+    crypto_hash_sha256_update(&state, key, crypto_generichash_BYTES);
+    crypto_hash_sha256_update(&state, password, strlen(password));
+
+    crypto_hash_sha256_final(&state, cypher_text);
+
+    return cypher_text;
+
 }
