@@ -1,23 +1,26 @@
-# variable
 CC = gcc
-CFLAGS = -wall -g 
-LIBFLAGS = -lsodium
-SRC_DIR = src 
+CFLAGS = -Wall -Wextra -Iinclude
+SRC_DIR = src
 BUILD_DIR = build
-BIN_DIR = test
-
-
-
-TARGET = $(BIN_DIR)/Noobpass
+LIB = -lsodium
+INCLUDE_DIR = include
+TESTS_DIR = tests
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+EXEC = tests/N00bpass
 
-$(TARGET): $(OBJS)
-    $(CC) $(CFLAGS) $^ -o $@ $(LIBFLAGS)
-
+all: $(EXEC)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-    $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $^ -o $@
+
+$(EXEC): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LIB)
 
 clean:
-    rm -f $(OBJS) $(TARGET)
+	rm -rf $(BUILD_DIR)/*.o $(EXEC) $(TESTS_DIR)/main
+
+test:
+	gcc $(TESTS_DIR)/main.c $(SRCS) $(CFLAGS) -o $(TESTS_DIR)/main
+	./$(TESTS_DIR)/main
+
