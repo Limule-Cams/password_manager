@@ -8,9 +8,10 @@
 #include<unistd.h>
 #include<ctype.h>
 #include<sodium.h>
+#define N_LEN 20
 
 typedef struct{
-    unsigned char name[crypto_generichash_BYTES];
+    char name[N_LEN];
     unsigned char password[crypto_generichash_BYTES];   
     char file[10];
 }Info_con;

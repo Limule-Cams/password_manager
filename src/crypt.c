@@ -83,15 +83,17 @@ ret:
     int name_len = strlen(name);
     int message_len = name_len + 5;
     char message[message_len];
-    char *key = (char*)malloc(sizeof(unsigned char)*crypto_generichash_BYTES);
+    char unsigned *key = malloc(sizeof(unsigned char)*crypto_generichash_BYTES);
     if(key==NULL){
         exit(EXIT_FAILURE);
     }
     strncpy(message, name, name_len);
     strncat(message, pass, 4);
     message[message_len] = '\0';
+    unsigned char mess[message_len];
+    memcpy(mess, message, message_len);
     crypto_generichash(key, crypto_generichash_BYTES,
-                   message, message_len,
+                   mess, message_len,
                    NULL, 0);
 
     return key;
@@ -99,7 +101,7 @@ ret:
 
 
 
-unsigned char* hash_passwd(unsigned char *key, char *password){
+unsigned char* hash_passwd(unsigned char *key, unsigned char *password, size_t len_p){
 
     unsigned char *cypher_text = malloc(sizeof(unsigned char)*crypto_hash_sha256_BYTES);
     if(cypher_text==NULL){
@@ -111,7 +113,7 @@ unsigned char* hash_passwd(unsigned char *key, char *password){
     crypto_hash_sha256_init(&state);
 
     crypto_hash_sha256_update(&state, key, crypto_generichash_BYTES);
-    crypto_hash_sha256_update(&state, password, strlen(password));
+    crypto_hash_sha256_update(&state, password, len_p);
 
     crypto_hash_sha256_final(&state, cypher_text);
 

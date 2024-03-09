@@ -17,7 +17,7 @@ Info_con* search_log(const char *file, const char *name, const char *password){
     while(fread(user, sizeof(Info_con), 1, fic) == 1) {
         if(strcmp(user->name, name) == 0) {
             // si aucun mot de passe n'est fourni, retourner directement l'utilisateur trouvé
-            if (password == NULL || strcmp(user->password, password) == 0) {
+            if (password == NULL || memcmp(user->password, password, crypto_generichash_BYTES) == 0) {
                 fclose(fic);
                 return user; 
             }
@@ -71,8 +71,7 @@ bool save_user(const char *name, const char *password, const char *myfile) {
     // et  ajouter le caractere de fin de chaine
     strncpy(user1.name, name, sizeof(user1.name) - 1);
     user1.name[sizeof(user1.name) - 1] = '\0'; 
-    strncpy(user1.password, password, sizeof(user1.password) - 1);
-    user1.password[sizeof(user1.password) - 1] = '\0'; 
+    memcpy(user1.password, password, crypto_generichash_BYTES);
     strncpy(user1.file, name, 4);
     user1.file[4] = '\0'; 
 
@@ -103,7 +102,7 @@ int change_password_u(char *file, char *name, char *pwd) {
 
      while (fread(&user, sizeof(Info_con), 1, fic) == 1) {
         if (strcmp(user.name, name) == 0) {
-            strcpy(user.password, pwd);
+            memcpy(user.password, pwd, crypto_generichash_BYTES);
 
             // aller à la position dans le fichier et écrire le nouvel élément en remplaçant l'ancien
             long position = ftell(fic) - sizeof(Info_con);
