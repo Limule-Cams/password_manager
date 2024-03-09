@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
         help_();
 
     }else{
+
+        unsigned char *key = key_genere(argv[2],argv[3]);
         
         if(strcmp(argv[1], "-h")==0){
             help_();
@@ -19,9 +21,16 @@ int main(int argc, char *argv[])
             if(argc!=4)
                 help_();
             else{
-                if(save_user(argv[2], argv[3], myfile)){
+
+                unsigned char plaint_pw[strlen(argv[3])];
+                memcpy(plaint_pw, argv[3], strlen(argv[3]));
+                unsigned char *hash_name = hash_passwd(key, plaint_pw, strlen(argv[3]));
+
+                if(save_user(argv[2], hash_name, myfile)){
                     printf("inscription valide \nconnectez vous\n");
+                    free(hash_name);
                 }else{
+                    free(hash_name);
                     printf("inscription echouer\n");
                     printf("\t\t-s  name password\n");
                 }
@@ -33,10 +42,17 @@ int main(int argc, char *argv[])
             if(argc!=4)
                 help_();
             else{
-                    if(change_password_u(myfile,argv[2], argv[3])==-1){
-                        printf("erreur de changement de password\n");
-                    }
-                   printf("changement reussi : %s\n", argv[3]);
+
+                unsigned char plaint_pw[strlen(argv[3])];
+                memcpy(plaint_pw, argv[3], strlen(argv[3]));
+                unsigned char *hash_name = hash_passwd(key, plaint_pw, strlen(argv[3]));
+
+                if(change_password_u(myfile,argv[2], hash_name)==-1){
+                    printf("erreur de changement de password\n");
+                    free(hash_name);
+                }
+                free(hash_name);
+                printf("changement reussi : %s\n", argv[3]);
             }
         }
         
@@ -52,9 +68,12 @@ int main(int argc, char *argv[])
 
                         if (access(myfile, R_OK) != -1) {
 
+                            unsigned char plaint_pw[strlen(argv[3])];
+                            memcpy(plaint_pw, argv[3], strlen(argv[3]));
+                            unsigned char *hash_name = hash_passwd(key, plaint_pw, strlen(argv[3]));     
                             
-                            
-                            Info_con *info_user = search_log(myfile, argv[2], argv[3]);
+                            Info_con *info_user = search_log(myfile, argv[2], hash_name);
+                            free(hash_name);
                             if(info_user==NULL){
                                 printf("\t\toups information ou format incorecte\n");
                                 printf("\t\t-l name password\n");
@@ -100,6 +119,7 @@ int main(int argc, char *argv[])
                                     if(add_pass(file, data)==-1)
                                         printf("erreur de sauvegarde");
                                     printf("sauvegarde OK");
+
 
                                     break;
                                 case 2:

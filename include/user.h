@@ -29,7 +29,7 @@ typedef enum{
  * @param password utiliser seulement pour les tentatives de connexions.
  * @return user si succès, NULL en cas d'erreur
  */
-Info_con* search_log(const char *file, const char *name, const char *password);
+Info_con* search_log(const char *file, const char *name, const unsigned char *password);
 
 /**
  * @brief Change le mot de passe d'un utilisateur dans le fichier de données des utilisateurs.
@@ -39,7 +39,7 @@ Info_con* search_log(const char *file, const char *name, const char *password);
  * @param pwd Le nouveau mot de passe à assigner à l'utilisateur.
  * @return 1 si la modification a été effectuée avec succès, -1 en cas d'erreur ou si l'utilisateur n'a pas été trouvé.
  */
-int change_password_u(char *file, char *name, char *pwd);
+int change_password_u(char *file, char *name, unsigned char *pwd);
 
 /**
  * @brief sauvegarde les infos de connexion des utilisateurs dans le fichier de logging.
@@ -49,7 +49,7 @@ int change_password_u(char *file, char *name, char *pwd);
  * @param pwd Le mot de passe à assigner à l'utilisateur.
  * @return true si  succès, false en cas d'erreur .
  */
-bool save_user(const char *name, const char *password, const char *myfile);
+bool save_user(const char *name, const unsigned char *password, const char *myfile);
 
 /**
  * @brief verificateur de la force du mot de passe

@@ -13,6 +13,6 @@ int decrypt(const char *target_file, const char *source_file,
         const unsigned char key[crypto_secretstream_xchacha20poly1305_KEYBYTES]);
 
 unsigned char* key_genere(char *name, char *pass);
-unsigned char* hash_passwd(unsigned char *key, unsigned char *password, size_t len_p);
+unsigned char* hash_passwd(unsigned char *key, unsigned char *password, int len_p);
 #endif
 

@@ -101,7 +101,7 @@ ret:
 
 
 
-unsigned char* hash_passwd(unsigned char *key, unsigned char *password, size_t len_p){
+unsigned char* hash_passwd(unsigned char *key, unsigned char *password, int len_p){
 
     unsigned char *cypher_text = malloc(sizeof(unsigned char)*crypto_hash_sha256_BYTES);
     if(cypher_text==NULL){

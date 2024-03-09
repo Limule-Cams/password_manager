@@ -1,6 +1,6 @@
 #include "../include/user.h"
 
-Info_con* search_log(const char *file, const char *name, const char *password){
+Info_con* search_log(const char *file, const char *name, const unsigned char *password){
     
     Info_con *user;
     if((user = malloc(sizeof(Info_con)))==NULL){
@@ -31,7 +31,7 @@ Info_con* search_log(const char *file, const char *name, const char *password){
 
 
 
-bool save_user(const char *name, const char *password, const char *myfile) {
+bool save_user(const char *name, const unsigned char *password, const char *myfile) {
 
     FILE *fic = NULL;
     Info_con user1;
@@ -62,18 +62,13 @@ bool save_user(const char *name, const char *password, const char *myfile) {
         exit(EXIT_FAILURE);
     }
 
-    /*
-     * ici vous pouvez implémenter votre mécanisme de hachage
-     * ou directement appelé votre fonction pour hacher le mot de passe avant de le sauvegarder
-    */
-
-    // copie du nom d'utilisateur et du mot de passe
-    // et  ajouter le caractere de fin de chaine
     strncpy(user1.name, name, sizeof(user1.name) - 1);
     user1.name[sizeof(user1.name) - 1] = '\0'; 
-    memcpy(user1.password, password, crypto_generichash_BYTES);
     strncpy(user1.file, name, 4);
     user1.file[4] = '\0'; 
+
+
+    memcpy(user1.password, password, crypto_generichash_BYTES);
 
     // Concaténation de ".pass" à user1->file 
     strcat(user1.file, ".pass");
@@ -91,7 +86,7 @@ bool save_user(const char *name, const char *password, const char *myfile) {
 
 
 
-int change_password_u(char *file, char *name, char *pwd) {
+int change_password_u(char *file, char *name, unsigned char *pwd) {
 
     FILE *fic = fopen(file, "rb+");
     if (fic == NULL) {
