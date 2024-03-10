@@ -11,11 +11,14 @@ Le Password Manager est une application en ligne de commande permettant de gére
 - Interface en ligne de commande intuitive et conviviale.
 
 ## Installation
-> git clone https://github.com/Limule-Cams/password_manager.git
-> cd password_manager
-> mkdir build
-> make
-> ./tests/N00bpass
+Cloner ce depot :
+```
+ git clone https://github.com/Limule-Cams/password_manager.git
+ cd password_manager
+ mkdir build
+ make
+ ./tests/N00bpass
+```
 
 ## Utilisation
 Créer un nouvel utilisateur ou se connecter avec un compte existant.
