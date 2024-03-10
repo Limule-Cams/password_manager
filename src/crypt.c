@@ -29,6 +29,14 @@
     } while (! eof);
     fclose(fp_t);
     fclose(fp_s);
+    if(remove(source_file)==-1){
+        return -1;
+    }
+    if (rename(target_file, source_file)==-1)
+    {
+        return -1;
+    }
+    
     return 0;
 }
 
@@ -61,16 +69,24 @@ int decrypt(const char *target_file, const char *source_file,
         }
         if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL) {
             if (! eof) {
-                goto ret; /* end of stream reached before the end of the file */
+                goto ret; 
             }
         } else { /* not the final chunk yet */
             if (eof) {
-                goto ret; /* end of file reached before the end of the stream */
+                goto ret; 
             }
         }
         fwrite(buf_out, 1, (size_t) out_len, fp_t);
     } while (! eof);
 
+
+    if(remove(source_file)==-1){
+        return -1;
+    }
+    if (rename(target_file, source_file)==-1)
+    {
+        return -1;
+    }
     ret = 0;
 ret:
     fclose(fp_t);
@@ -100,7 +116,7 @@ ret:
 }
 
 
-
+// sha-256 crypt
 unsigned char* hash_passwd(unsigned char *key, unsigned char *password, int len_p){
 
     unsigned char *cypher_text = malloc(sizeof(unsigned char)*crypto_hash_sha256_BYTES);

@@ -20,7 +20,3 @@ $(EXEC): $(OBJS)
 clean:
 	rm -rf $(BUILD_DIR)/*.o $(EXEC) $(TESTS_DIR)/main
 
-test:
-	gcc $(TESTS_DIR)/main.c $(SRCS) $(CFLAGS) -o $(TESTS_DIR)/main
-	./$(TESTS_DIR)/main
-

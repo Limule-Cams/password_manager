@@ -80,9 +80,11 @@ int main(int argc, char *argv[])
                                 free(info_user);
                                 exit(EXIT_FAILURE);
                             }
-                            char file[11];//
+                            char file[11], dest_file[7];//
                             strcpy(file, info_user->file);
                             file[sizeof(info_user->file) - 1] = '\0';
+                            strncpy(dest_file, file, 4);
+                            strcat(dest_file, "tmp");
                             int c = 0;
                             system("clear");
                             printf("\n\n\t\t\t\t\tHello, %s   bienvenue ici !(--)! \n\n", info_user->name);
