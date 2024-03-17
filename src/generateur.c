@@ -56,6 +56,7 @@ int add_pass(const char *file, Info *data_write){
     if(myfile ==NULL){
         fprintf(stdout," erreur d'ouverture de fichier");
         free(data_write);
+        free(myfile);
         return -1;
     }
     if(fwrite(data_write, sizeof(Info), 1, myfile)!=1){;
